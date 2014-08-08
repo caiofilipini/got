@@ -25,7 +25,6 @@ func (irc IRC) handleRead(bot Bot) {
 		if err != nil {
 			panic(err)
 		}
-		log.Println("[IRC]", msg)
 
 		msg = msg[:len(msg)-2]
 		if strings.Contains(msg, "PING") {

@@ -12,7 +12,7 @@ const (
 	WelcomeMsg = "OHAI"
 )
 
-type Handler func(...string)
+type Handler func(Bot, string)
 
 type Bot struct {
 	irc      IRC
@@ -40,20 +40,17 @@ func (bot Bot) Start() {
 
 func (bot Bot) Listen() {
 	for r := range bot.request {
-		log.Printf("Received request: %s\n", r)
+		info(fmt.Sprintf("Received request: %s", r))
 
 		parts := strings.Fields(r)
-		command, args := parts[0], parts[1:]
+		command := parts[0]
+		query := strings.Join(parts[1:], " ")
 		if handler, registered := bot.commands[command]; registered {
-			handler(args...)
+			handler(bot, query)
 		} else {
-			log.Printf("WARNING: Unknown command \"%s\".\n", r)
+			info(fmt.Sprintf("WARNING: Unknown command \"%s\"", r))
 		}
 	}
-}
-
-func (bot Bot) Swear(args ...string) {
-	bot.irc.Send("ANNAGG A MARONN!")
 }
 
 func (bot Bot) ActionRequested(msg string) bool {
@@ -67,6 +64,10 @@ func (bot Bot) Handle(msg string) {
 	}
 }
 
+func (bot Bot) Send(msg string) {
+	bot.irc.Send(msg)
+}
+
 func NewBot(irc IRC, user, passwd string) Bot {
 	return Bot{
 		irc,
@@ -76,4 +77,8 @@ func NewBot(irc IRC, user, passwd string) Bot {
 		make(chan string),
 		regexp.MustCompile(fmt.Sprintf("PRIVMSG %s :%s (.*)", irc.channel, Action)),
 	}
+}
+
+func info(msg string) {
+	log.Printf("[Bot] %s\n", msg)
 }

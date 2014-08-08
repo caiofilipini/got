@@ -25,7 +25,7 @@ func (irc IRC) handleRead(bot Bot) {
 		if err != nil {
 			panic(err)
 		}
-		log.Println(msg)
+		log.Println("[IRC]", msg)
 
 		msg = msg[:len(msg)-2]
 		if strings.Contains(msg, "PING") {
@@ -47,7 +47,7 @@ func (irc IRC) handlePing() {
 		server := strings.Split(ping, ":")[1]
 
 		irc.out <- fmt.Sprintf("PONG %s", server)
-		log.Printf("PONG sent to %s\n", server)
+		log.Printf("[IRC] PONG sent to %s\n", server)
 	}
 }
 
@@ -71,7 +71,7 @@ func NewIRC(server string, port int, channel string) IRC {
 	if err != nil {
 		panic(err)
 	}
-	log.Printf("Connected to %s (%s).\n", server, conn.RemoteAddr())
+	log.Printf("[IRC] Connected to %s (%s).\n", server, conn.RemoteAddr())
 
 	return IRC{
 		server,

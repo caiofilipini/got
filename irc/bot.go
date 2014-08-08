@@ -12,7 +12,7 @@ const (
 	WelcomeMsg = "OHAI"
 )
 
-type Handler func(Bot, string)
+type Handler func(string) []string
 
 type Bot struct {
 	irc      IRC
@@ -35,6 +35,7 @@ func (bot Bot) Start() {
 	bot.irc.out <- fmt.Sprintf("NICK %s", bot.user)
 	bot.irc.out <- fmt.Sprintf("USER %s 0.0.0.0 0.0.0.0 :%s", bot.user, bot.user)
 	bot.irc.out <- fmt.Sprintf("JOIN %s %s", bot.irc.channel, bot.passwd)
+
 	bot.irc.Send(WelcomeMsg)
 }
 
@@ -45,8 +46,10 @@ func (bot Bot) Listen() {
 		parts := strings.Fields(r)
 		command := parts[0]
 		query := strings.Join(parts[1:], " ")
+
 		if handler, registered := bot.commands[command]; registered {
-			handler(bot, query)
+			messages := handler(query)
+			bot.irc.Send(messages...)
 		} else {
 			info(fmt.Sprintf("WARNING: Unknown command \"%s\"", r))
 		}
@@ -62,10 +65,6 @@ func (bot Bot) Handle(msg string) {
 	if len(req) > 1 {
 		bot.request <- req[1]
 	}
-}
-
-func (bot Bot) Send(msg string) {
-	bot.irc.Send(msg)
 }
 
 func NewBot(irc IRC, user, passwd string) Bot {

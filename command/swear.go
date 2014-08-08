@@ -1,7 +1,5 @@
 package command
 
-import "github.com/caiofilipini/got/irc"
-
-func Swear(bot irc.Bot, query string) {
-	bot.Send("annagg a maronn")
+func Swear(query string) []string {
+	return []string{"annagg a maronn"}
 }

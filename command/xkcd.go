@@ -8,8 +8,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/caiofilipini/got/irc"
 )
 
 const (
@@ -33,7 +31,7 @@ type XKCDResult struct {
 	News       string `json:"news"`
 }
 
-func XKCD(bot irc.Bot, query string) {
+func XKCD(query string) []string {
 	q := strings.Trim(query, " ")
 	current := loadComic(XKCDLatestUrl)
 	comic := current
@@ -43,17 +41,18 @@ func XKCD(bot irc.Bot, query string) {
 	} else if match := numRegexp.FindStringSubmatch(q); len(match) > 1 {
 		if number, err := strconv.Atoi(match[1]); err == nil {
 			if number == 404 {
-				bot.Send("smart ass :)")
-				return
+				return []string{"smart ass :)"}
 			}
 
 			comic = loadComic(fmt.Sprintf(XKCDNumberUrl, number))
 		}
 	}
 
-	bot.Send(comic.Img)
-	bot.Send(comic.Title)
-	bot.Send(comic.Alt)
+	return []string{
+		comic.Img,
+		comic.Title,
+		comic.Alt,
+	}
 }
 
 func loadComic(url string) *XKCDResult {

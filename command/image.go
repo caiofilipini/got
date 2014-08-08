@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"math/rand"
-
-	"github.com/caiofilipini/got/irc"
 )
 
 const (
@@ -24,7 +22,7 @@ type ImageResults struct {
 	Data ResponseData `json:"responseData"`
 }
 
-func Image(bot irc.Bot, query string) {
+func Image(query string) []string {
 	params := map[string]string{
 		"q":    query,
 		"v":    "1.0",
@@ -39,9 +37,11 @@ func Image(bot irc.Bot, query string) {
 		if images := result.Data.Images; len(images) > 0 {
 			selected := images[rand.Intn(len(images))]
 
-			bot.Send(selected.UnescapedUrl)
+			return []string{selected.UnescapedUrl}
 		}
 	} else {
 		log.Println("ERROR:", err)
 	}
+
+	return []string{}
 }

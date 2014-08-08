@@ -61,8 +61,10 @@ func (irc IRC) Close() {
 	irc.conn.Close()
 }
 
-func (irc IRC) Send(msg string) {
-	irc.out <- fmt.Sprintf("PRIVMSG %s :%s", irc.channel, msg)
+func (irc IRC) Send(messages ...string) {
+	for _, msg := range messages {
+		irc.out <- fmt.Sprintf("PRIVMSG %s :%s", irc.channel, msg)
+	}
 }
 
 func NewIRC(server string, port int, channel string) IRC {

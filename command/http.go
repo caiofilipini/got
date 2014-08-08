@@ -46,7 +46,11 @@ func (c HTTPClient) Get() ([]byte, error) {
 }
 
 func (c HTTPClient) fullUrl() string {
-	return fmt.Sprintf("%s?%s", c.baseUrl, c.queryString())
+	if len(c.params) > 0 {
+		return fmt.Sprintf("%s?%s", c.baseUrl, c.queryString())
+	} else {
+		return c.baseUrl
+	}
 }
 
 func (c HTTPClient) queryString() string {

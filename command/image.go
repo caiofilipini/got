@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"math/rand"
-	"time"
 
 	"github.com/caiofilipini/got/irc"
 )
@@ -12,10 +11,6 @@ import (
 const (
 	ImageSearchUrl = "http://ajax.googleapis.com/ajax/services/search/images"
 )
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 type ImageResult struct {
 	UnescapedUrl string `json:"unescapedUrl"`

@@ -47,6 +47,7 @@ func main() {
 	bot.Register("gif", command.GIF)
 	bot.Register("video", command.Video)
 	bot.Register("xkcd", command.XKCD)
+	bot.Register("beer", command.BeerOclock)
 
 	bot.Start()
 	go bot.Listen()

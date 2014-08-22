@@ -18,9 +18,18 @@ func init() {
 	queryRegexp = regexp.MustCompile(`(?i)time|long|til|left|remaining|eta`)
 }
 
-func BeerOclock(query string) []string {
+type BeerOclock struct{}
+
+func (b BeerOclock) Pattern() *regexp.Regexp {
+	return regexp.MustCompile(`(?i)beer\s*(.*)`)
+}
+
+func (b BeerOclock) Run(query string) []string {
+	fmt.Println(query)
 	now := time.Now()
 	hour := now.Hour()
+	beerOclock := hour >= StartingHour
+	beerOclockEmoji := fmt.Sprintf("%s%s", Beer, Clock)
 
 	var result string
 
@@ -29,14 +38,17 @@ func BeerOclock(query string) []string {
 		minuteDiff := 60 - now.Minute()
 		secondDiff := 60 - now.Second()
 
-		result = fmt.Sprintf(
-			"%s%s in %d hour(s), %d minute(s) and %d second(s)",
-			Beer,
-			Clock,
-			hourDiff,
-			minuteDiff,
-			secondDiff)
-	} else if hour >= StartingHour {
+		if beerOclock {
+			result = fmt.Sprintf("It's already %s! Enjoy!", beerOclockEmoji)
+		} else {
+			result = fmt.Sprintf(
+				"%s in %d hour(s), %d minute(s) and %d second(s)",
+				beerOclockEmoji,
+				hourDiff,
+				minuteDiff,
+				secondDiff)
+		}
+	} else if beerOclock {
 		result = fmt.Sprintf("YES! %s%s%s", Beer, Beer, Beer)
 	} else {
 		result = "Not yet. :("

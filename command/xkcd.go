@@ -31,7 +31,13 @@ type XKCDResult struct {
 	News       string `json:"news"`
 }
 
-func XKCD(query string) []string {
+type XKCD struct{}
+
+func (x XKCD) Pattern() *regexp.Regexp {
+	return regexp.MustCompile(`(?i)xkcd\s+([^\s]+)`)
+}
+
+func (x XKCD) Run(query string) []string {
 	q := strings.Trim(query, " ")
 	current := loadComic(XKCDLatestUrl)
 	comic := current

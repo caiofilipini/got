@@ -4,11 +4,31 @@ import (
 	"encoding/json"
 	"log"
 	"math/rand"
+	"regexp"
 )
 
 const (
 	ImageSearchUrl = "http://ajax.googleapis.com/ajax/services/search/images"
 )
+
+type Image struct{}
+type GIF struct{}
+
+func (i Image) Pattern() *regexp.Regexp {
+	return regexp.MustCompile(`(?i)image|img\s+([^\s]+)`)
+}
+
+func (i Image) Run(query string) []string {
+	return findImages(query, Params{})
+}
+
+func (g GIF) Pattern() *regexp.Regexp {
+	return regexp.MustCompile(`(?i)gif|animate\s+([^\s]+)`)
+}
+
+func (g GIF) Run(query string) []string {
+	return findImages(query, Params{"imgtype": "animated"})
+}
 
 type Params map[string]string
 
@@ -28,14 +48,6 @@ type ResponseData struct {
 
 type ImageResults struct {
 	Data ResponseData `json:"responseData"`
-}
-
-func Image(query string) []string {
-	return findImages(query, Params{})
-}
-
-func GIF(query string) []string {
-	return findImages(query, Params{"imgtype": "animated"})
 }
 
 func findImages(query string, params Params) []string {

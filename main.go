@@ -41,13 +41,13 @@ func main() {
 	bot := irc.NewBot(conn, *user, *passwd)
 
 	// Register commands
-	bot.Register("swear", command.Swear)
-	bot.Register("greet", command.Greet)
-	bot.Register("image", command.Image)
-	bot.Register("gif", command.GIF)
-	bot.Register("video", command.Video)
-	bot.Register("xkcd", command.XKCD)
-	bot.Register("beer", command.BeerOclock)
+	bot.Register(command.Swear{})
+	bot.Register(command.Greet{})
+	bot.Register(command.Image{})
+	bot.Register(command.GIF{})
+	bot.Register(command.Video{})
+	bot.Register(command.XKCD{})
+	bot.Register(command.BeerOclock{})
 
 	bot.Start()
 	go bot.Listen()

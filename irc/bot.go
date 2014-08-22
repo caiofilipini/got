@@ -12,19 +12,32 @@ const (
 	WelcomeMsg = "OHAI"
 )
 
-type Handler func(string) []string
+type Command interface {
+	Run(string) []string
+	Pattern() *regexp.Regexp
+}
 
 type Bot struct {
 	irc      IRC
 	user     string
 	passwd   string
-	commands map[string]Handler
+	commands []Command
 	request  chan string
 	action   *regexp.Regexp
 }
 
-func (bot Bot) Register(command string, handler Handler) {
-	bot.commands[command] = handler
+func (bot *Bot) Register(command Command) {
+	bot.commands = append(bot.commands, command)
+}
+
+func (bot Bot) Recognise(request string) (Command, string, error) {
+	for _, c := range bot.commands {
+		if match := c.Pattern().FindStringSubmatch(request); len(match) > 0 {
+			fmt.Println(strings.Join(match, ","))
+			return c, match[len(match)-1], nil
+		}
+	}
+	return nil, "", fmt.Errorf("Don't know how to handle \"%s\"", request)
 }
 
 func (bot Bot) Start() {
@@ -43,15 +56,11 @@ func (bot Bot) Listen() {
 	for r := range bot.request {
 		info(fmt.Sprintf("Received request: %s", r))
 
-		parts := strings.Fields(r)
-		command := parts[0]
-		query := strings.Join(parts[1:], " ")
-
-		if handler, registered := bot.commands[command]; registered {
-			messages := handler(query)
+		if command, query, err := bot.Recognise(r); err == nil {
+			messages := command.Run(query)
 			bot.irc.Send(messages...)
 		} else {
-			info(fmt.Sprintf("WARNING: Unknown command \"%s\"", r))
+			info(fmt.Sprintf("WARNING: %s", err.Error()))
 		}
 	}
 }
@@ -61,8 +70,7 @@ func (bot Bot) ActionRequested(msg string) bool {
 }
 
 func (bot Bot) Handle(msg string) {
-	req := bot.action.FindStringSubmatch(msg)
-	if len(req) > 1 {
+	if req := bot.action.FindStringSubmatch(msg); len(req) > 1 {
 		bot.request <- req[1]
 	}
 }
@@ -72,7 +80,7 @@ func NewBot(irc IRC, user, passwd string) Bot {
 		irc,
 		user,
 		passwd,
-		make(map[string]Handler),
+		make([]Command, 0),
 		make(chan string),
 		regexp.MustCompile(fmt.Sprintf("PRIVMSG %s :%s (.*)", irc.channel, Action)),
 	}

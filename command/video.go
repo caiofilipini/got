@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"math/rand"
+	"regexp"
 )
 
 const (
@@ -28,7 +29,13 @@ type VideoResults struct {
 	Feed FeedData `json:"feed"`
 }
 
-func Video(query string) []string {
+type Video struct{}
+
+func (v Video) Pattern() *regexp.Regexp {
+	return regexp.MustCompile(`(?i)video|youtube|yt\s+([^\s]+)`)
+}
+
+func (v Video) Run(query string) []string {
 	params := map[string]string{
 		"q":           query,
 		"orderBy":     "relevance",

@@ -15,7 +15,7 @@ type Image struct{}
 type GIF struct{}
 
 func (i Image) Pattern() *regexp.Regexp {
-	return regexp.MustCompile(`(?i)image|img\s+([^\s]+)`)
+	return regexp.MustCompile(`(?i)(image|img)\s+([^\s].*)`)
 }
 
 func (i Image) Run(query string) []string {
@@ -23,7 +23,7 @@ func (i Image) Run(query string) []string {
 }
 
 func (g GIF) Pattern() *regexp.Regexp {
-	return regexp.MustCompile(`(?i)gif|animate\s+([^\s]+)`)
+	return regexp.MustCompile(`(?i)(gif|animate)\s+([^\s].*)`)
 }
 
 func (g GIF) Run(query string) []string {

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"regexp"
-	"strings"
 )
 
 const (
@@ -33,7 +32,6 @@ func (bot *Bot) Register(command Command) {
 func (bot Bot) Recognise(request string) (Command, string, error) {
 	for _, c := range bot.commands {
 		if match := c.Pattern().FindStringSubmatch(request); len(match) > 0 {
-			fmt.Println(strings.Join(match, ","))
 			return c, match[len(match)-1], nil
 		}
 	}

@@ -32,7 +32,7 @@ type VideoResults struct {
 type Video struct{}
 
 func (v Video) Pattern() *regexp.Regexp {
-	return regexp.MustCompile(`(?i)video|youtube|yt\s+([^\s]+)`)
+	return regexp.MustCompile(`(?i)(video|youtube|yt)\s+([^\s].*)`)
 }
 
 func (v Video) Run(query string) []string {

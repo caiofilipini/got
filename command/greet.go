@@ -8,7 +8,7 @@ import (
 type Greet struct{}
 
 func (g Greet) Pattern() *regexp.Regexp {
-	return regexp.MustCompile(`(?i)greet\s+([^\s]+)`)
+	return regexp.MustCompile(`(?i)greet\s+([^\s].*)`)
 }
 
 func (g Greet) Run(query string) []string {

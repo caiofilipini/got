@@ -34,7 +34,7 @@ type XKCDResult struct {
 type XKCD struct{}
 
 func (x XKCD) Pattern() *regexp.Regexp {
-	return regexp.MustCompile(`(?i)xkcd\s+([^\s]+)`)
+	return regexp.MustCompile(`(?i)xkcd\s*(.*)`)
 }
 
 func (x XKCD) Run(query string) []string {

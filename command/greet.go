@@ -5,12 +5,18 @@ import (
 	"regexp"
 )
 
-type Greet struct{}
-
-func (g Greet) Pattern() *regexp.Regexp {
-	return regexp.MustCompile(`(?i)greet\s+([^\s].*)`)
+type GreetCommand struct {
+	pattern *regexp.Regexp
 }
 
-func (g Greet) Run(query string) []string {
+func Greet() GreetCommand {
+	return GreetCommand{regexp.MustCompile(`(?i)greet\s+([^\s].*)`)}
+}
+
+func (c GreetCommand) Pattern() *regexp.Regexp {
+	return c.pattern
+}
+
+func (c GreetCommand) Run(query string) []string {
 	return []string{fmt.Sprintf("ohai there, %s!", query)}
 }

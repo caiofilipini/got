@@ -11,22 +11,35 @@ const (
 	ImageSearchUrl = "http://ajax.googleapis.com/ajax/services/search/images"
 )
 
-type Image struct{}
-type GIF struct{}
-
-func (i Image) Pattern() *regexp.Regexp {
-	return regexp.MustCompile(`(?i)(image|img)\s+([^\s].*)`)
+type ImageCommand struct {
+	pattern *regexp.Regexp
 }
 
-func (i Image) Run(query string) []string {
+func Image() ImageCommand {
+	return ImageCommand{regexp.MustCompile(`(?i)(image|img)\s+([^\s].*)`)}
+}
+
+func (c ImageCommand) Pattern() *regexp.Regexp {
+	return c.pattern
+}
+
+func (c ImageCommand) Run(query string) []string {
 	return findImages(query, Params{})
 }
 
-func (g GIF) Pattern() *regexp.Regexp {
-	return regexp.MustCompile(`(?i)(gif|animate)\s+([^\s].*)`)
+type GIFCommand struct {
+	pattern *regexp.Regexp
 }
 
-func (g GIF) Run(query string) []string {
+func GIF() GIFCommand {
+	return GIFCommand{regexp.MustCompile(`(?i)(gif|animate)\s+([^\s].*)`)}
+}
+
+func (c GIFCommand) Pattern() *regexp.Regexp {
+	return c.pattern
+}
+
+func (c GIFCommand) Run(query string) []string {
 	return findImages(query, Params{"imgtype": "animated"})
 }
 

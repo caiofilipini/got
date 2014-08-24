@@ -29,13 +29,19 @@ type VideoResults struct {
 	Feed FeedData `json:"feed"`
 }
 
-type Video struct{}
-
-func (v Video) Pattern() *regexp.Regexp {
-	return regexp.MustCompile(`(?i)(video|youtube|yt)\s+([^\s].*)`)
+type VideoCommand struct {
+	pattern *regexp.Regexp
 }
 
-func (v Video) Run(query string) []string {
+func Video() VideoCommand {
+	return VideoCommand{regexp.MustCompile(`(?i)(video|youtube|yt)\s+([^\s].*)`)}
+}
+
+func (c VideoCommand) Pattern() *regexp.Regexp {
+	return c.pattern
+}
+
+func (c VideoCommand) Run(query string) []string {
 	params := map[string]string{
 		"q":           query,
 		"orderBy":     "relevance",

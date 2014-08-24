@@ -2,12 +2,18 @@ package command
 
 import "regexp"
 
-type Swear struct{}
-
-func (s Swear) Pattern() *regexp.Regexp {
-	return regexp.MustCompile(`(?i)swear\s?(.*)`)
+type SwearCommand struct {
+	pattern *regexp.Regexp
 }
 
-func (s Swear) Run(query string) []string {
+func Swear() SwearCommand {
+	return SwearCommand{regexp.MustCompile(`(?i)swear\s?(.*)`)}
+}
+
+func (c SwearCommand) Pattern() *regexp.Regexp {
+	return c.pattern
+}
+
+func (c SwearCommand) Run(query string) []string {
 	return []string{"annagg a maronn"}
 }

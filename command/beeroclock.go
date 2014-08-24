@@ -18,13 +18,19 @@ func init() {
 	queryRegexp = regexp.MustCompile(`(?i)time|long|til|left|remaining|eta`)
 }
 
-type BeerOclock struct{}
-
-func (b BeerOclock) Pattern() *regexp.Regexp {
-	return regexp.MustCompile(`(?i)beer\s*(.*)`)
+type BeerOClockCommand struct {
+	pattern *regexp.Regexp
 }
 
-func (b BeerOclock) Run(query string) []string {
+func BeerOClock() BeerOClockCommand {
+	return BeerOClockCommand{regexp.MustCompile(`(?i)beer\s*(.*)`)}
+}
+
+func (c BeerOClockCommand) Pattern() *regexp.Regexp {
+	return c.pattern
+}
+
+func (c BeerOClockCommand) Run(query string) []string {
 	fmt.Println(query)
 	now := time.Now()
 	hour := now.Hour()

@@ -40,6 +40,7 @@ func main() {
 	defer conn.Close()
 
 	bot := bot.NewBot(conn, *user, *passwd)
+	defer bot.Shutdown()
 
 	// Register commands
 	bot.Register(command.Swear())

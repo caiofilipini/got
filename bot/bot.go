@@ -60,6 +60,11 @@ func (bot Bot) Listen() {
 	}
 }
 
+func (bot Bot) Shutdown() {
+	close(bot.in)
+	close(bot.request)
+}
+
 func (bot Bot) recognise(request string) (Command, string, error) {
 	for _, c := range bot.commands {
 		if match := c.Pattern().FindStringSubmatch(request); len(match) > 0 {

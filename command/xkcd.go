@@ -45,26 +45,25 @@ func (c XKCDCommand) Pattern() *regexp.Regexp {
 
 func (c XKCDCommand) Run(query string) []string {
 	q := strings.Trim(query, " ")
-	current := loadComic(XKCDLatestUrl)
-	comic := current
 
-	if q == "random" {
-		comic = loadComic(fmt.Sprintf(XKCDNumberUrl, rand.Intn(current.Num)))
-	} else if match := numRegexp.FindStringSubmatch(q); len(match) > 1 {
+	if match := numRegexp.FindStringSubmatch(q); len(match) > 1 {
 		if number, err := strconv.Atoi(match[1]); err == nil {
 			if number == 404 {
 				return []string{"smart ass :)"}
 			}
 
-			comic = loadComic(fmt.Sprintf(XKCDNumberUrl, number))
+			return render(loadComic(fmt.Sprintf(XKCDNumberUrl, number)))
 		}
 	}
 
-	return []string{
-		comic.Img,
-		comic.Title,
-		comic.Alt,
+	current := loadComic(XKCDLatestUrl)
+	comic := current
+
+	if q == "random" {
+		comic = loadComic(fmt.Sprintf(XKCDNumberUrl, rand.Intn(current.Num)))
 	}
+
+	return render(comic)
 }
 
 func loadComic(url string) *XKCDResult {
@@ -77,4 +76,12 @@ func loadComic(url string) *XKCDResult {
 		log.Println("ERROR:", err)
 	}
 	return nil
+}
+
+func render(comic *XKCDResult) []string {
+	return []string{
+		comic.Img,
+		comic.Title,
+		comic.Alt,
+	}
 }

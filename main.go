@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/caiofilipini/got/bot"
 	"github.com/caiofilipini/got/command"
 	"github.com/caiofilipini/got/irc"
 )
@@ -38,7 +39,7 @@ func main() {
 	conn := irc.NewIRC(*server, *port, *channel)
 	defer conn.Close()
 
-	bot := irc.NewBot(conn, *user, *passwd)
+	bot := bot.NewBot(conn, *user, *passwd)
 
 	// Register commands
 	bot.Register(command.Swear())

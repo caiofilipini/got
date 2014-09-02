@@ -71,6 +71,7 @@ func main() {
 	bot.Register(command.Video())
 	bot.Register(command.XKCD())
 	bot.Register(command.BeerOClock())
+	bot.Register(command.Weather())
 
 	bot.Start()
 	go bot.Listen()

@@ -9,16 +9,18 @@ import (
 	"strings"
 )
 
+type Params map[string]string
+
 type HTTPClient struct {
 	baseUrl string
-	params  map[string]string
+	params  Params
 }
 
 func NewHTTPClient(url string) HTTPClient {
-	return HTTPClient{url, make(map[string]string)}
+	return HTTPClient{url, make(Params)}
 }
 
-func (c HTTPClient) With(params map[string]string) HTTPClient {
+func (c HTTPClient) With(params Params) HTTPClient {
 	for k, v := range params {
 		c.params[k] = url.QueryEscape(v)
 	}

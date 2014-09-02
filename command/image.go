@@ -43,8 +43,6 @@ func (c GIFCommand) Run(query string) []string {
 	return findImages(query, Params{"imgtype": "animated"})
 }
 
-type Params map[string]string
-
 var defaultParams = Params{
 	"v":    "1.0",
 	"safe": "active",

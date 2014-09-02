@@ -36,7 +36,7 @@ func (c VideoCommand) Pattern() *regexp.Regexp {
 }
 
 func (c VideoCommand) Run(query string) []string {
-	params := map[string]string{
+	params := Params{
 		"q":           query,
 		"orderBy":     "relevance",
 		"max-results": "15",

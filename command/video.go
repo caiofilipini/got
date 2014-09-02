@@ -11,22 +11,16 @@ const (
 	VideoSearchUrl = "http://gdata.youtube.com/feeds/api/videos"
 )
 
-type VideoLink struct {
-	Rel  string `json:"rel"`
-	Type string `json:"type"`
-	Href string `json:"href"`
-}
-
-type VideoResult struct {
-	Links []VideoLink `json:"link"`
-}
-
-type FeedData struct {
-	Entries []VideoResult `json:"entry"`
-}
-
-type VideoResults struct {
-	Feed FeedData `json:"feed"`
+type videoResults struct {
+	Feed struct {
+		Entries []struct {
+			Links []struct {
+				Rel  string `json:"rel"`
+				Type string `json:"type"`
+				Href string `json:"href"`
+			} `json:"link"`
+		} `json:"entry"`
+	} `json:"feed"`
 }
 
 type VideoCommand struct {
@@ -50,7 +44,7 @@ func (c VideoCommand) Run(query string) []string {
 	}
 
 	if body, err := NewHTTPClient(VideoSearchUrl).With(params).Get(); err == nil {
-		var result VideoResults
+		var result videoResults
 		json.Unmarshal(body, &result)
 
 		if videos := result.Feed.Entries; len(videos) > 0 {

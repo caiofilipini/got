@@ -12,11 +12,12 @@ import (
 )
 
 var (
-	server  *string
-	port    *int
-	channel *string
-	user    *string
-	passwd  *string
+	server      *string
+	port        *int
+	channel     *string
+	user        *string
+	passwd      *string
+	logFilePath *string
 )
 
 func init() {
@@ -25,6 +26,7 @@ func init() {
 	user = flag.String("u", "gotgotgot", "bot username")
 	channel = flag.String("c", "", "channel to connect")
 	passwd = flag.String("k", "", "channel secret key")
+	logFilePath = flag.String("l", "", "log file location; if empty, stdout will be used")
 
 	flag.Parse()
 
@@ -35,7 +37,26 @@ func init() {
 	}
 }
 
+func setupLogging() *os.File {
+	if *logFilePath != "" {
+		file, err := os.OpenFile(*logFilePath, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.SetOutput(file)
+		return file
+	}
+
+	return nil
+}
+
 func main() {
+	logFile := setupLogging()
+	if logFile != nil {
+		defer logFile.Close()
+	}
+
 	conn := irc.NewIRC(*server, *port, *channel)
 	defer conn.Close()
 

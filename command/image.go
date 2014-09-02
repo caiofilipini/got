@@ -51,16 +51,12 @@ var defaultParams = Params{
 	"rsz":  "8",
 }
 
-type ImageResult struct {
-	UnescapedUrl string `json:"unescapedUrl"`
-}
-
-type ResponseData struct {
-	Images []ImageResult `json:"results"`
-}
-
-type ImageResults struct {
-	Data ResponseData `json:"responseData"`
+type imageResults struct {
+	Data struct {
+		Images []struct {
+			UnescapedUrl string `json:"unescapedUrl"`
+		} `json:"results"`
+	} `json:"responseData"`
 }
 
 func findImages(query string, params Params) []string {
@@ -72,7 +68,7 @@ func findImages(query string, params Params) []string {
 	var imgUrl string
 
 	if body, err := NewHTTPClient(ImageSearchUrl).With(params).Get(); err == nil {
-		var result ImageResults
+		var result imageResults
 		json.Unmarshal(body, &result)
 
 		if images := result.Data.Images; len(images) > 0 {

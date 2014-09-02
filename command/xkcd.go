@@ -18,17 +18,10 @@ const (
 var numRegexp = regexp.MustCompile(`(^\d+$)`)
 
 type XKCDResult struct {
-	Num        int    `json:"num"`
-	Day        string `json:"day"`
-	Month      string `json:"month"`
-	Year       string `json:"year"`
-	Img        string `json:"img"`
-	Link       string `json:"link"`
-	SafeTitle  string `json:"safe_title"`
-	Title      string `json:"title"`
-	Alt        string `json:"alt"`
-	Transcript string `json:"transcript"`
-	News       string `json:"news"`
+	Num   int    `json:"num"`
+	Img   string `json:"img"`
+	Title string `json:"title"`
+	Alt   string `json:"alt"`
 }
 
 type XKCDCommand struct {

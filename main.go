@@ -72,6 +72,7 @@ func main() {
 	bot.Register(command.XKCD())
 	bot.Register(command.BeerOClock())
 	bot.Register(command.Weather())
+	bot.Register(command.Luca()) // tribute to lucapette
 
 	bot.Start()
 	go bot.Listen()

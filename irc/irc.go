@@ -75,7 +75,7 @@ func (irc IRC) handleRead() {
 	for {
 		msg, err := buf.ReadString('\n')
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("Error while reading message: %v\n", err)
 		}
 
 		msg = msg[:len(msg)-2]

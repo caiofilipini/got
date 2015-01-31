@@ -3,10 +3,12 @@ package irc
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"regexp"
 	"strings"
+	"time"
 )
 
 type IRC struct {
@@ -20,11 +22,7 @@ type IRC struct {
 }
 
 func NewIRC(server string, port int, channel string) IRC {
-	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", server, port))
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("[IRC] Connected to %s (%s).\n", server, conn.RemoteAddr())
+	conn := connect(server, port)
 
 	irc := IRC{
 		server:        server,
@@ -69,13 +67,22 @@ func (irc IRC) Subscribe(pattern *regexp.Regexp, channel chan string) {
 	irc.subscriptions[pattern] = channel
 }
 
-func (irc IRC) handleRead() {
+func (irc *IRC) handleRead() {
 	buf := bufio.NewReaderSize(irc.conn, 512)
 
 	for {
 		msg, err := buf.ReadString('\n')
 		if err != nil {
-			log.Fatalf("Error while reading message: %v\n", err)
+			if recoverable(err) {
+				log.Printf("Error [%s] while reading message, reconnecting in 1s...\n", err)
+				<-time.After(1 * time.Second)
+
+				irc.conn = connect(irc.server, irc.port)
+
+				continue
+			} else {
+				log.Fatalf("Unrecoverable error while reading message: %v\n", err)
+			}
 		}
 
 		msg = msg[:len(msg)-2]
@@ -111,4 +118,22 @@ func (irc IRC) send(msg string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func connect(server string, port int) net.Conn {
+	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", server, port))
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("[IRC] Connected to %s (%s).\n", server, conn.RemoteAddr())
+	return conn
+}
+
+func recoverable(err error) bool {
+	if e, netError := err.(net.Error); netError && e.Temporary() {
+		return true
+	} else if err == io.EOF {
+		return true
+	}
+	return false
 }

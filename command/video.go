@@ -24,15 +24,33 @@ type videoResults struct {
 }
 
 type VideoCommand struct {
+	name    string
 	pattern *regexp.Regexp
 }
 
 func Video() VideoCommand {
-	return VideoCommand{regexp.MustCompile(`(?i)(video|youtube|yt)\s+([^\s].*)`)}
+	return VideoCommand{
+		"video",
+		regexp.MustCompile(`(?i)(video|youtube|yt)\s+([^\s].*)`),
+	}
+}
+
+func (c VideoCommand) Name() string {
+	return c.name
 }
 
 func (c VideoCommand) Pattern() *regexp.Regexp {
 	return c.pattern
+}
+
+func (c VideoCommand) Help() string {
+	return c.name + " – video search"
+}
+
+func (c VideoCommand) Usage() []string {
+	return []string{
+		"video|youtube|yt <query>",
+	}
 }
 
 func (c VideoCommand) Run(query string) []string {

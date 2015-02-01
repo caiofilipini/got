@@ -25,15 +25,35 @@ type XKCDResult struct {
 }
 
 type XKCDCommand struct {
+	name    string
 	pattern *regexp.Regexp
 }
 
 func XKCD() XKCDCommand {
-	return XKCDCommand{regexp.MustCompile(`(?i)xkcd\s*(.*)`)}
+	return XKCDCommand{
+		"xkcd",
+		regexp.MustCompile(`(?i)xkcd\s*(.*)`),
+	}
+}
+
+func (c XKCDCommand) Name() string {
+	return c.name
 }
 
 func (c XKCDCommand) Pattern() *regexp.Regexp {
 	return c.pattern
+}
+
+func (c XKCDCommand) Help() string {
+	return c.name + " – shows XKCD comics"
+}
+
+func (c XKCDCommand) Usage() []string {
+	return []string{
+		c.name + " – shows the latest comic",
+		c.name + " random – shows a random comic",
+		c.name + " <number> – shows comic with the given number",
+	}
 }
 
 func (c XKCDCommand) Run(query string) []string {

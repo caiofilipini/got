@@ -19,19 +19,37 @@ func init() {
 }
 
 type BeerOClockCommand struct {
+	name    string
 	pattern *regexp.Regexp
 }
 
 func BeerOClock() BeerOClockCommand {
-	return BeerOClockCommand{regexp.MustCompile(`(?i)beer\s*(.*)`)}
+	return BeerOClockCommand{
+		"beer",
+		regexp.MustCompile(`(?i)beer\s*(.*)`),
+	}
+}
+
+func (c BeerOClockCommand) Name() string {
+	return c.name
 }
 
 func (c BeerOClockCommand) Pattern() *regexp.Regexp {
 	return c.pattern
 }
 
+func (c BeerOClockCommand) Help() string {
+	return c.name + " – is it beer o'clock yet?"
+}
+
+func (c BeerOClockCommand) Usage() []string {
+	return []string{
+		c.name + " – tells if it's beer o'clock",
+		c.name + " ETA – tells how long until beer o'clock",
+	}
+}
+
 func (c BeerOClockCommand) Run(query string) []string {
-	fmt.Println(query)
 	now := time.Now()
 	hour := now.Hour()
 	beerOclock := hour >= StartingHour

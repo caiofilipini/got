@@ -12,15 +12,33 @@ const (
 )
 
 type ImageCommand struct {
+	name    string
 	pattern *regexp.Regexp
 }
 
 func Image() ImageCommand {
-	return ImageCommand{regexp.MustCompile(`(?i)(image|img)\s+([^\s].*)`)}
+	return ImageCommand{
+		"image",
+		regexp.MustCompile(`(?i)(image|img)\s+([^\s].*)`),
+	}
+}
+
+func (c ImageCommand) Name() string {
+	return c.name
 }
 
 func (c ImageCommand) Pattern() *regexp.Regexp {
 	return c.pattern
+}
+
+func (c ImageCommand) Help() string {
+	return c.name + " – image search"
+}
+
+func (c ImageCommand) Usage() []string {
+	return []string{
+		"image|img <query>",
+	}
 }
 
 func (c ImageCommand) Run(query string) []string {
@@ -28,15 +46,33 @@ func (c ImageCommand) Run(query string) []string {
 }
 
 type GIFCommand struct {
+	name    string
 	pattern *regexp.Regexp
 }
 
 func GIF() GIFCommand {
-	return GIFCommand{regexp.MustCompile(`(?i)(gif|animate)\s+([^\s].*)`)}
+	return GIFCommand{
+		"gif",
+		regexp.MustCompile(`(?i)(gif|animate)\s+([^\s].*)`),
+	}
+}
+
+func (c GIFCommand) Name() string {
+	return c.name
 }
 
 func (c GIFCommand) Pattern() *regexp.Regexp {
 	return c.pattern
+}
+
+func (c GIFCommand) Help() string {
+	return c.name + " – GIF search"
+}
+
+func (c GIFCommand) Usage() []string {
+	return []string{
+		"git|animate <query>",
+	}
 }
 
 func (c GIFCommand) Run(query string) []string {

@@ -12,15 +12,33 @@ const (
 )
 
 type WeatherCommand struct {
+	name    string
 	pattern *regexp.Regexp
 }
 
 func Weather() WeatherCommand {
-	return WeatherCommand{regexp.MustCompile(`(?i)weather\s+([^\s].*)`)}
+	return WeatherCommand{
+		"weather",
+		regexp.MustCompile(`(?i)weather\s+([^\s].*)`),
+	}
+}
+
+func (c WeatherCommand) Name() string {
+	return c.name
 }
 
 func (c WeatherCommand) Pattern() *regexp.Regexp {
 	return c.pattern
+}
+
+func (c WeatherCommand) Help() string {
+	return c.name + " – shows weather conditions"
+}
+
+func (c WeatherCommand) Usage() []string {
+	return []string{
+		c.name + " <city> – shows current weather conditions for the given city",
+	}
 }
 
 func (c WeatherCommand) Run(query string) []string {

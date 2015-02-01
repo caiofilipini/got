@@ -46,14 +46,20 @@ func (c WeatherCommand) Run(query string) []string {
 		var result weatherResults
 		json.Unmarshal(body, &result)
 
-		celsius := int(math.Floor(result.Main.Kelvin-273.15) + 0.5)
+		if len(result.Weather) > 0 {
+			celsius := int(math.Floor(result.Main.Kelvin-273.15) + 0.5)
 
-		return []string{
-			fmt.Sprintf("%s, %s: %d°C, %s",
-				result.Name,
-				result.Sys.Country,
-				celsius,
-				result.Weather[0].Description),
+			return []string{
+				fmt.Sprintf("%s, %s: %d°C, %s",
+					result.Name,
+					result.Sys.Country,
+					celsius,
+					result.Weather[0].Description),
+			}
+		} else {
+			return []string{
+				"Couldn't find weather information for " + query,
+			}
 		}
 	}
 	return []string{}

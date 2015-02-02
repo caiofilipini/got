@@ -1,3 +1,4 @@
+// Package irc provides a basic implementation of the IRC protocol.
 package irc
 
 import (
@@ -11,16 +12,35 @@ import (
 	"time"
 )
 
+// IRC represents an connection to a channel.
 type IRC struct {
-	server        string
-	port          int
-	Channel       string
-	conn          net.Conn
-	ping          chan string
-	out           chan string
+	// The IRC server to connect to.
+	server string
+
+	// The server port to connect to.
+	port int
+
+	// The IRC channel to connect to.
+	Channel string
+
+	// The connection to the IRC server.
+	conn net.Conn
+
+	// The channel where to send PING messages.
+	ping chan string
+
+	// The channel where to send messages that should
+	// be sent back to the server.
+	out chan string
+
+	// A map where the key is a regexp pattern to be matched against,
+	// and the value is a channel where to send messages that match
+	// the specified pattern.
 	subscriptions map[*regexp.Regexp]chan string
 }
 
+// New connects to the specified server:port and returns
+// an IRC value for interacting with the server.
 func NewIRC(server string, port int, channel string) IRC {
 	conn := connect(server, port)
 
@@ -41,6 +61,7 @@ func NewIRC(server string, port int, channel string) IRC {
 	return irc
 }
 
+// Close closes the underlying IRC connection.
 func (irc IRC) Close() {
 	irc.conn.Close()
 
@@ -51,18 +72,25 @@ func (irc IRC) Close() {
 	}
 }
 
+// SendMessages sends the given list of messages over the wire
+// to the connected channel.
 func (irc IRC) SendMessages(messages ...string) {
 	for _, msg := range messages {
 		irc.out <- fmt.Sprintf("PRIVMSG %s :%s", irc.Channel, msg)
 	}
 }
 
+// Join joins the configured channel with the given
+// user credentials.
 func (irc IRC) Join(user string, passwd string) {
 	irc.out <- fmt.Sprintf("NICK %s", user)
 	irc.out <- fmt.Sprintf("USER %s 0.0.0.0 0.0.0.0 :%s", user, user)
 	irc.out <- fmt.Sprintf("JOIN %s %s", irc.Channel, passwd)
 }
 
+// Subscribe configures a message subscription pattern that,
+// when matched, causes the message to be sent to the specified
+// channel.
 func (irc IRC) Subscribe(pattern *regexp.Regexp, channel chan string) {
 	irc.subscriptions[pattern] = channel
 }

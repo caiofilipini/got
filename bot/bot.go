@@ -1,3 +1,4 @@
+// Package bot provides the implementation of the IRC bot.
 package bot
 
 import (
@@ -9,31 +10,72 @@ import (
 )
 
 const (
-	Action      = "!got"
-	WelcomeMsg  = "OHAI"
+	// Action is the command that triggers the bot.
+	Action = "!got"
+
+	// WelcomeMsg is the message to be printed out when the bot is online.
+	WelcomeMsg = "OHAI"
+
+	// HelpCommand is the pattern for the help command.
 	HelpCommand = `(?i)help\s*(.*)`
 )
 
+// Command is the interface that registered commands need to
+// implement in order to receive messages.
 type Command interface {
-	Run(string) []string
+	// Name returns the command name.
 	Name() string
+
+	// Pattern returns the pattern to be matched against
+	// in order to check if this command should be triggered.
 	Pattern() *regexp.Regexp
+
+	// Help returns the help message for this command.
 	Help() string
+
+	// Usage returns details about how to use this command.
 	Usage() []string
+
+	// Run receives a query and returns a list of messages
+	// to be sent in response.
+	Run(string) []string
 }
 
+// Bot represents a running instance of the bot.
 type Bot struct {
-	irc            irc.IRC
-	user           string
-	passwd         string
-	commands       []Command
+	// The IRC connection.
+	irc irc.IRC
+
+	// The user representing the bot in the IRC channel.
+	user string
+
+	// The password for the IRC channel (if applicable).
+	passwd string
+
+	// The list of registered commands.
+	commands []Command
+
+	// A map where the key is the command name, and the
+	// value is the command itself.
 	commandsByName map[string]Command
-	action         *regexp.Regexp
-	helpPattern    *regexp.Regexp
-	request        chan string
-	in             chan string
+
+	// The regexp pattern that matches the action to trigger
+	// the bot.
+	action *regexp.Regexp
+
+	// The regexp pattern that matches the help command.
+	helpPattern *regexp.Regexp
+
+	// The channel where filtered requests are sent.
+	request chan string
+
+	// The channel where messages that match the configured
+	// action are sent.
+	in chan string
 }
 
+// NewBot creates and return a value representing
+// a connected bot.
 func NewBot(irc irc.IRC, user, passwd string) Bot {
 	return Bot{
 		irc:            irc,
@@ -48,17 +90,22 @@ func NewBot(irc irc.IRC, user, passwd string) Bot {
 	}
 }
 
+// Register registers the given command.
 func (bot *Bot) Register(command Command) {
 	bot.commands = append(bot.commands, command)
 	bot.commandsByName[command.Name()] = command
 }
 
+// Start joins the channel, sends a welcome message and
+// subscribes to messages that match the configured action.
 func (bot Bot) Start() {
 	bot.irc.Subscribe(bot.action, bot.in)
 	bot.irc.Join(bot.user, bot.passwd)
 	bot.irc.SendMessages(WelcomeMsg)
 }
 
+// Listen starts a background process to listen to
+// incoming requests.
 func (bot Bot) Listen() {
 	go bot.handleRequests()
 
@@ -69,6 +116,7 @@ func (bot Bot) Listen() {
 	}
 }
 
+// Shutdown closes the incoming request channels.
 func (bot Bot) Shutdown() {
 	close(bot.in)
 	close(bot.request)

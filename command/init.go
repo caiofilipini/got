@@ -1,3 +1,5 @@
+// Package command provides basic funcionality and implementation
+// of the default commands.
 package command
 
 import (

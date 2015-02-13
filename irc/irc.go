@@ -95,6 +95,10 @@ func (irc IRC) Subscribe(pattern *regexp.Regexp, channel chan string) {
 	irc.subscriptions[pattern] = channel
 }
 
+// handleRead reads all messages sent to the IRC channel.
+// If it's a "PING" message, forwards it to the ping channel;
+// otherwise, looks for a subscription that matches the message
+// and forwards it to the registered channel.
 func (irc *IRC) handleRead() {
 	buf := bufio.NewReaderSize(irc.conn, 512)
 
@@ -126,12 +130,17 @@ func (irc *IRC) handleRead() {
 	}
 }
 
+// handleWrite reads messages from the out channel
+// and sends them over the wire.
 func (irc IRC) handleWrite() {
 	for msg := range irc.out {
 		irc.send(msg)
 	}
 }
 
+// handlePing reads messages from the ping channel
+// and sends the "PONG" response to the server originating
+// the "PING" request.
 func (irc IRC) handlePing() {
 	for ping := range irc.ping {
 		server := strings.Split(ping, ":")[1]
@@ -141,6 +150,7 @@ func (irc IRC) handlePing() {
 	}
 }
 
+// send is responsible for writing the bytes over the wire.
 func (irc IRC) send(msg string) {
 	_, err := irc.conn.Write([]byte(fmt.Sprintf("%s\r\n", msg)))
 	if err != nil {
@@ -148,6 +158,8 @@ func (irc IRC) send(msg string) {
 	}
 }
 
+// connect dials to the configured server and returns
+// the connection.
 func connect(server string, port int) net.Conn {
 	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", server, port))
 	if err != nil {
@@ -157,6 +169,8 @@ func connect(server string, port int) net.Conn {
 	return conn
 }
 
+// recoverable checks if the given error is temporary and could
+// be recovered from.
 func recoverable(err error) bool {
 	if e, netError := err.(net.Error); netError && e.Temporary() {
 		return true

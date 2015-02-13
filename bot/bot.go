@@ -122,6 +122,10 @@ func (bot Bot) Shutdown() {
 	close(bot.request)
 }
 
+// recognise verifies if the given request is a recognised command.
+// If the command is regonised, returns the command itself,
+// the query part of the request, and a nil error;
+// if the command is not recognised, returns an error.
 func (bot Bot) recognise(request string) (Command, string, error) {
 	for _, c := range bot.commands {
 		if match := c.Pattern().FindStringSubmatch(request); len(match) > 0 {
@@ -131,6 +135,9 @@ func (bot Bot) recognise(request string) (Command, string, error) {
 	return nil, "", fmt.Errorf("Don't know how to handle \"%s\"", request)
 }
 
+// showHelp formats and sends a help message containing
+// a list of all registered commands. If a command is given,
+// shows the usage information for that command.
 func (bot Bot) showHelp(command string) {
 	var helpMessages []string
 
@@ -153,6 +160,8 @@ func (bot Bot) showHelp(command string) {
 	bot.irc.SendMessages(helpMessages...)
 }
 
+// handleRequests runs in the background and handles requests
+// sent to the request channel.
 func (bot Bot) handleRequests() {
 	for r := range bot.request {
 		info(fmt.Sprintf("Received request: %s", r))
@@ -169,6 +178,8 @@ func (bot Bot) handleRequests() {
 	}
 }
 
+// formatHelp adds the action string to all the help
+// messages for clarity.
 func formatHelp(messages ...string) []string {
 	formatted := make([]string, len(messages))
 	for i, m := range messages {
@@ -177,6 +188,7 @@ func formatHelp(messages ...string) []string {
 	return formatted
 }
 
+// info prints the given message into the log.
 func info(msg string) {
 	log.Printf("[Bot] %s\n", msg)
 }
